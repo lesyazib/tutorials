@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './App.css'; // Убедитесь, что импортируете CSS
+import './App.css';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -24,7 +24,6 @@ function App() {
   };
 
   const handleSearch = () => {
-    // Построение параметров запроса
     const params = new URLSearchParams({
       price: price,
       keywords: keywords,
