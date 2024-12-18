@@ -38,19 +38,25 @@ def search_llm(
         keywords: str,
         availability: bool
 ):
-    query = f"""
-        SELECT llm.name, llm.description, tariff.price, availability.status FROM llm
+    query = """
+        SELECT llm.name, llm.description, tariff.price, availability.status
+        FROM llm
         JOIN tariff ON llm.id = tariff.llm_id
         JOIN availability ON llm.id = availability.llm_id
-        WHERE tariff.price <= {price}
-          AND llm.description ILIKE '%{keywords}%'
-          AND availability.status = {availability};
+        WHERE tariff.price <= %s
+        AND to_tsvector('english', llm.description) @@ plainto_tsquery('english', %s)
+        AND availability.status = %s;
     """
 
+    params = (price, keywords, availability)
+    # params = (price, availability)
+
     print(query)
+    print(f"Parameters: {params}")
 
     with psycopg2.connect('postgres://postgres:olesya2004@localhost:5432/try') as conn:
         cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute(query)
+        cur.execute(query, params)
         data = cur.fetchall()
     return data
+
